@@ -8,70 +8,53 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$db = getDB();
 $user_id = $_SESSION['user_id'];
+$user_type = $_SESSION['user_type'];
+$db = getDB();
 
-// Handle mark as read
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_read'])) {
-    $notification_id = intval($_POST['notification_id']);
-    $stmt = $db->prepare("UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?");
-    $stmt->execute([$notification_id, $user_id]);
-}
-
-// Get notifications
+// Fetch notifications for the user
 $stmt = $db->prepare("SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50");
 $stmt->execute([$user_id]);
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$primary = '#007bff';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notifications | ServiGo</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body { background: #f8f9fa; }
-        .notification-item { border-left: 4px solid transparent; }
-        .notification-item.unread { border-left-color: <?php echo $primary; ?>; background-color: #f0f8ff; }
-    </style>
 </head>
-<body>
+<body class="bg-light">
 <div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">Notifications</h4>
-                </div>
-                <div class="card-body">
-                    <?php if (count($notifications) > 0): ?>
-                        <?php foreach ($notifications as $notif): ?>
-                        <div class="notification-item p-3 mb-2 <?php echo $notif['is_read'] ? '' : 'unread'; ?>">
-                            <h6><?php echo htmlspecialchars($notif['title']); ?></h6>
-                            <p><?php echo htmlspecialchars($notif['message']); ?></p>
-                            <small class="text-muted"><?php echo date('M j, Y g:i a', strtotime($notif['created_at'])); ?></small>
-                            <?php if (!$notif['is_read']): ?>
-                            <form method="post" class="mt-2">
-                                <input type="hidden" name="notification_id" value="<?php echo $notif['id']; ?>">
-                                <button type="submit" name="mark_read" class="btn btn-sm btn-primary">Mark as Read</button>
-                            </form>
-                            <?php endif; ?>
-                        </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="text-center py-4">
-                            <h5 class="text-muted">No notifications</h5>
-                            <p class="text-muted">You're all caught up!</p>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <div class="text-center mt-4">
-                <a href="dashboard.php" class="btn btn-outline-primary">Back to Dashboard</a>
-            </div>
+    <h2 class="mb-4 text-center">Notifications</h2>
+    <div class="mb-3 text-end">
+        <?php if ($user_type === 'provider'): ?>
+            <a href="provider_dashboard.php" class="btn btn-secondary">Back to Provider Dashboard</a>
+        <?php else: ?>
+            <a href="dashboard.php" class="btn btn-secondary">Back to Dashboard</a>
+        <?php endif; ?>
+    </div>
+    <div class="card">
+        <div class="card-body p-0">
+            <ul class="list-group list-group-flush">
+                <?php if (empty($notifications)): ?>
+                    <li class="list-group-item text-center text-muted">No notifications found.</li>
+                <?php else: ?>
+                    <?php foreach ($notifications as $note): ?>
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong><?php echo htmlspecialchars($note['title']); ?></strong>
+                                    <div class="small text-muted"><?php echo htmlspecialchars($note['message']); ?></div>
+                                </div>
+                                <span class="badge bg-<?php echo $note['is_read'] ? 'secondary' : 'primary'; ?> ms-2"><?php echo $note['is_read'] ? 'Read' : 'New'; ?></span>
+                            </div>
+                            <div class="small text-muted mt-1 text-end"><?php echo format_datetime($note['created_at']); ?></div>
+                        </li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </ul>
         </div>
     </div>
 </div>

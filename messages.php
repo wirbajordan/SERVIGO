@@ -11,8 +11,9 @@ if (!isset($_SESSION['user_id'])) {
 $db = getDB();
 $user_id = $_SESSION['user_id'];
 $success = $error = '';
+$user_type = $_SESSION['user_type'];
 
-// Handle new message submission
+// Handle new message submission (existing conversation or new)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
     $receiver_id = intval($_POST['receiver_id']);
     $message_text = trim($_POST['message']);
@@ -30,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
     }
 }
 
-// Get conversations (users you've messaged with)
+// Get conversations (users you've messaged with) with last message preview
 $conversations = [];
 $stmt = $db->prepare("
     SELECT DISTINCT 
@@ -38,16 +39,21 @@ $stmt = $db->prepare("
             WHEN m.sender_id = ? THEN m.receiver_id 
             ELSE m.sender_id 
         END as other_user_id,
-        u.first_name, u.last_name, u.profile_image,
+        u.first_name, u.last_name, u.profile_image, u.user_type,
         MAX(m.created_at) as last_message_time,
+        (
+            SELECT message FROM messages m2 
+            WHERE (m2.sender_id = ? AND m2.receiver_id = u.id) OR (m2.sender_id = u.id AND m2.receiver_id = ?) 
+            ORDER BY m2.created_at DESC LIMIT 1
+        ) as last_message,
         COUNT(CASE WHEN m.is_read = 0 AND m.receiver_id = ? THEN 1 END) as unread_count
     FROM messages m
     JOIN users u ON (m.sender_id = u.id OR m.receiver_id = u.id)
     WHERE (m.sender_id = ? OR m.receiver_id = ?) AND u.id != ?
-    GROUP BY other_user_id, u.first_name, u.last_name, u.profile_image
-    ORDER BY last_message_time DESC
+    GROUP BY other_user_id, u.first_name, u.last_name, u.profile_image, u.user_type
+    ORDER BY 6 DESC
 ");
-$stmt->execute([$user_id, $user_id, $user_id, $user_id, $user_id]);
+$stmt->execute([$user_id, $user_id, $user_id, $user_id, $user_id, $user_id, $user_id]);
 $conversations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Get messages with a specific user
@@ -80,16 +86,28 @@ if (isset($_GET['user_id'])) {
     }
 }
 
-// Get all users for new message
-$all_users = [];
-$stmt = $db->prepare("
-    SELECT id, first_name, last_name, user_type, city 
-    FROM users 
-    WHERE id != ? AND is_active = 1 
-    ORDER BY first_name, last_name
-");
-$stmt->execute([$user_id]);
-$all_users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Get all users for new message (exclude self)
+if ($user_type === 'provider') {
+    // Providers can only message customers
+    $stmt = $db->prepare("
+        SELECT id, first_name, last_name, user_type, city 
+        FROM users 
+        WHERE id != ? AND is_active = 1 AND user_type = 'customer' 
+        ORDER BY first_name, last_name
+    ");
+    $stmt->execute([$user_id]);
+    $all_users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    // Customers and others can message anyone
+    $stmt = $db->prepare("
+        SELECT id, first_name, last_name, user_type, city 
+        FROM users 
+        WHERE id != ? AND is_active = 1 
+        ORDER BY first_name, last_name
+    ");
+    $stmt->execute([$user_id]);
+    $all_users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 $primary = '#007bff';
 ?>
@@ -115,6 +133,10 @@ $primary = '#007bff';
         .conversation-item.active { background-color: <?php echo $primary; ?>; color: white; }
         .unread-badge { background: #dc3545; color: white; border-radius: 50%; padding: 0.25rem 0.5rem; font-size: 0.75rem; }
         .profile-img { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; }
+        .conversation-search { margin: 0.5rem 1rem 0.5rem 1rem; }
+        .last-message-preview { font-size: 0.9em; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .empty-state { text-align: center; color: #888; padding: 3rem 1rem; }
+        .customer-highlight { background: #e6f7ff !important; }
     </style>
 </head>
 <body>
@@ -122,19 +144,39 @@ $primary = '#007bff';
     <div class="row">
         <div class="col-md-4">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Conversations</h5>
+                    <button class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#newMessageModal"><i class="fas fa-plus"></i> New Message</button>
+                </div>
+                <div class="conversation-search">
+                    <input type="text" id="conversationSearch" class="form-control" placeholder="Search conversations...">
                 </div>
                 <div class="card-body p-0">
-                    <div class="list-group list-group-flush">
+                    <div class="list-group list-group-flush" id="conversationList">
+                        <?php if (empty($conversations)): ?>
+                            <div class="empty-state">
+                                <i class="fas fa-comments fa-3x mb-3"></i>
+                                <p>No conversations yet.<br>Start a new message!</p>
+                            </div>
+                        <?php else: ?>
                         <?php foreach ($conversations as $conv): ?>
+                        <?php
+                        // Highlight customer conversations for providers
+                        $is_customer = isset($conv['user_type']) ? $conv['user_type'] === 'customer' : false;
+                        ?>
                         <a href="?user_id=<?php echo $conv['other_user_id']; ?>" 
-                           class="list-group-item list-group-item-action conversation-item <?php echo (isset($_GET['user_id']) && $_GET['user_id'] == $conv['other_user_id']) ? 'active' : ''; ?>">
+                           class="list-group-item list-group-item-action conversation-item <?php echo (isset($_GET['user_id']) && $_GET['user_id'] == $conv['other_user_id']) ? 'active' : ''; ?><?php echo ($user_type === 'provider' && $is_customer) ? ' customer-highlight' : ''; ?>">
                             <div class="d-flex align-items-center">
                                 <img src="<?php echo $conv['profile_image'] ? htmlspecialchars($conv['profile_image']) : 'assets/images/default-profile.png'; ?>" 
                                      class="profile-img me-2" alt="Profile">
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-0"><?php echo htmlspecialchars($conv['first_name'] . ' ' . $conv['last_name']); ?></h6>
+                                    <h6 class="mb-0">
+                                        <?php echo htmlspecialchars($conv['first_name'] . ' ' . $conv['last_name']); ?>
+                                        <?php if ($user_type === 'provider' && (isset($conv['user_type']) ? $conv['user_type'] === 'customer' : false)): ?>
+                                            <span class="badge bg-info text-dark ms-1">Customer</span>
+                                        <?php endif; ?>
+                                    </h6>
+                                    <div class="last-message-preview"><?php echo htmlspecialchars($conv['last_message']); ?></div>
                                     <small class="text-muted"><?php echo date('M j, g:i a', strtotime($conv['last_message_time'])); ?></small>
                                 </div>
                                 <?php if ($conv['unread_count'] > 0): ?>
@@ -143,6 +185,7 @@ $primary = '#007bff';
                             </div>
                         </a>
                         <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -191,11 +234,66 @@ $primary = '#007bff';
             </div>
         </div>
     </div>
+    <!-- New Message Modal -->
+    <div class="modal fade" id="newMessageModal" tabindex="-1" role="dialog" aria-labelledby="newMessageModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form method="post">
+            <div class="modal-header">
+              <h5 class="modal-title" id="newMessageModalLabel">Start New Conversation</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="receiver_id">Select User</label>
+                <select name="receiver_id" id="receiver_id" class="form-control" required>
+                  <option value="">-- Select User --</option>
+                  <?php foreach ($all_users as $u): ?>
+                    <option value="<?php echo $u['id']; ?>"><?php echo htmlspecialchars($u['first_name'] . ' ' . $u['last_name'] . ' (' . ucfirst($u['user_type']) . ', ' . $u['city'] . ')'); ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+              <div class="form-group mt-3">
+                <label for="new_message">Message</label>
+                <textarea name="message" id="new_message" class="form-control" rows="3" required></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="submit" name="send_message" class="btn btn-primary">Send</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
     <div class="text-center mt-4">
-        <a href="dashboard.php" class="btn btn-outline-primary">Back to Dashboard</a>
+        <a href="dashboard.php" class="btn btn-outline-secondary">Back to Dashboard</a>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Bootstrap 4 modal compatibility
+$(function () {
+    $('[data-toggle="modal"]').on('click', function(e) {
+        var target = $(this).data('target');
+        $(target).modal('show');
+    });
+});
+
+// Conversation search filter
+$(function () {
+    $('#conversationSearch').on('input', function() {
+        var val = $(this).val().toLowerCase();
+        $('#conversationList .conversation-item').each(function() {
+            var name = $(this).find('h6').text().toLowerCase();
+            var preview = $(this).find('.last-message-preview').text().toLowerCase();
+            $(this).toggle(name.indexOf(val) !== -1 || preview.indexOf(val) !== -1);
+        });
+    });
+});
+</script>
 </body>
 </html> 

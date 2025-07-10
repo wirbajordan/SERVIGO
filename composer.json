@@ -1,0 +1,6 @@
+{
+    "require": {
+        "phpmailer/phpmailer": "*",
+        "guzzlehttp/guzzle": "^7.9"
+    }
+}

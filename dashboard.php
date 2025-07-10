@@ -86,6 +86,20 @@ if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin') {
             </div>
         </div>
     </section>
+    <!-- Add this button at the top or where appropriate in your dashboard -->
+    <div class="text-center my-4">
+        <a href="pay.php" class="btn btn-success btn-lg">Make a Payment</a>
+    </div>
+    <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'provider'): ?>
+    <div class="text-center my-4">
+        <a href="provider_dashboard.php" class="btn btn-primary btn-lg">Provider Dashboard</a>
+    </div>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'customer'): ?>
+    <div class="text-center my-4">
+        <a href="customer_dashboard.php" class="btn btn-primary btn-lg">Customer Dashboard</a>
+    </div>
+    <?php endif; ?>
     <footer class="footer bg-neutral-dark text-white mt-5">
         <div class="container py-4">
             <div class="row">
