@@ -91,7 +91,7 @@ session_start();
                     <p>Connecting Cameroon with trusted local service providers.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <p class="mb-0">&copy; 2024 ServiGo. All rights reserved. | Made for Cameroon</p>
+                    <p class="mb-0">&copy; 2025 ServiGo. All rights reserved. | Made for Cameroon</p>
                 </div>
             </div>
         </div>

@@ -1,15 +1,46 @@
 <?php
 session_start();
+require_once 'config/database.php';
+
 $success = '';
+$error = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
     $subject = trim($_POST['subject']);
     $message = trim($_POST['message']);
-    // Here you would normally send the email or store the message
-    $success = 'Thank you, ' . htmlspecialchars($name) . '! Your message has been received.';
+    
+    try {
+        $stmt = $pdo->prepare("INSERT INTO contact_messages (name, email, subject, message, created_at) 
+                             VALUES (:name, :email, :subject, :message, NOW())");
+        
+        $result = $stmt->execute([
+            'name' => $name,
+            'email' => $email,
+            'subject' => $subject,
+            'message' => $message
+        ]);
+        
+        if ($result) {
+            $success = 'Thank you, ' . htmlspecialchars($name) . '! Your message has been received.';
+        } else {
+            $error = 'Sorry, there was an error sending your message. Please try again.';
+        }
+    } catch (PDOException $e) {
+        $error = 'Sorry, there was an error sending your message. Please try again.';
+        error_log("Contact form error: " . $e->getMessage());
+    }
 }
+
 ?>
+ <?php if ($success): ?>
+        <div class="alert alert-success"><?php echo $success; ?></div>
+    <?php endif; ?>
+    <?php if ($error): ?>
+        <div class="alert alert-danger"><?php echo $error; ?></div>
+    <?php endif; ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <h2 class="mb-4"><i class="fas fa-info-circle me-2"></i>Contact Info</h2>
                     <p><i class="fas fa-map-marker-alt me-2"></i>Yaoundé, Cameroon</p>
                     <p><i class="fas fa-envelope me-2"></i><a href="mailto:info@servigo.com">info@servigo.com</a></p>
-                    <p><i class="fas fa-phone me-2"></i>+237 6XX XXX XXX</p>
+                    <p><i class="fas fa-phone me-2"></i>+237 674 419 495</p>
                     <hr>
                     <h5>Follow Us</h5>
                     <a href="#" class="me-2"><i class="fab fa-facebook fa-lg"></i></a>
@@ -114,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <p>Connecting Cameroon with trusted local service providers.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <p class="mb-0">&copy; 2024 ServiGo. All rights reserved. | Made for Cameroon</p>
+                    <p class="mb-0">&copy; 2025 ServiGo. All rights reserved. | Made for Cameroon</p>
                 </div>
             </div>
         </div>

@@ -21,6 +21,36 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .carousel-caption {
+            background: linear-gradient(90deg, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.2) 100%);
+            border-radius: 10px;
+            padding: 1.5rem 2rem;
+            left: 5%;
+            right: 5%;
+            bottom: 2rem;
+            text-align: left;
+            animation: fadeInUp 1s;
+        }
+        .carousel-item img {
+            object-fit: cover;
+            height: 400px;
+            width: 100%;
+        }
+        .carousel-service-icon {
+            font-size: 2.2rem;
+            margin-right: 0.7rem;
+            vertical-align: middle;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 768px) {
+            .carousel-caption { padding: 1rem; font-size: 0.95rem; }
+            .carousel-item img { height: 220px; }
+        }
+    </style>
 </head>
 <body class="bg-light">
     <!-- Header -->
@@ -61,11 +91,86 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
                     <a href="register.php" class="btn btn-success btn-lg mb-2">Become a Provider</a>
                 </div>
                 <div class="col-md-6 text-center">
-                    <img src="assets/images/hero.webp" alt="Local Services" class="img-fluid rounded shadow">
+                    <img src="assets/images/electrician.jpeg" alt="Local Services" class="img-fluid rounded shadow">
                 </div>
             </div>
         </div>
     </section>
+    <!-- Carousel Section -->
+<div id="featureCarousel" class="carousel slide mb-5" data-bs-ride="carousel" data-bs-interval="3500" data-bs-pause="hover">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+    <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="4" aria-label="Slide 5"></button>
+    <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="5" aria-label="Slide 6"></button>
+  </div>
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="assets/images/tailoring1.jpeg" alt="Tailoring">
+      <div class="carousel-caption">
+        <span class="carousel-service-icon"><i class="fas fa-cut"></i></span>
+        <h5 class="d-inline">Tailoring</h5>
+        <p>Get custom clothes made or repaired by local tailoring experts.</p>
+        <a href="services.php?category=tailoring" class="btn btn-light btn-sm mt-2">Learn More</a>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="assets/images/plumbering.jpeg" alt="Plumbering">
+      <div class="carousel-caption">
+        <span class="carousel-service-icon"><i class="fas fa-wrench"></i></span>
+        <h5 class="d-inline">Plumbering</h5>
+        <p>Fix leaks, install pipes, and solve all your plumbing issues quickly.</p>
+        <a href="services.php?category=plumbering" class="btn btn-light btn-sm mt-2">Learn More</a>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="assets/images/mechanic.jpeg" alt="Mechanic">
+      <div class="carousel-caption">
+        <span class="carousel-service-icon"><i class="fas fa-car"></i></span>
+        <h5 class="d-inline">Mechanic</h5>
+        <p>Professional mechanics for car repairs and maintenance at your convenience.</p>
+        <a href="services.php?category=mechanic" class="btn btn-light btn-sm mt-2">Learn More</a>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="assets/images/capenters.jpeg" alt="Carpentry">
+      <div class="carousel-caption">
+        <span class="carousel-service-icon"><i class="fas fa-hammer"></i></span>
+        <h5 class="d-inline">Carpentry</h5>
+        <p>Custom furniture, repairs, and woodwork by skilled carpenters.</p>
+        <a href="services.php?category=carpentry" class="btn btn-light btn-sm mt-2">Learn More</a>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="assets/images/delivery services.jpeg" alt="Delivery">
+      <div class="carousel-caption">
+        <span class="carousel-service-icon"><i class="fas fa-truck"></i></span>
+        <h5 class="d-inline">Delivery</h5>
+        <p>Fast and reliable delivery services for your packages and goods.</p>
+        <a href="services.php?category=delivery" class="btn btn-light btn-sm mt-2">Learn More</a>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="assets/images/catering.web" alt="Catering">
+      <div class="carousel-caption">
+        <span class="carousel-service-icon"><i class="fas fa-utensils"></i></span>
+        <h5 class="d-inline">Catering</h5>
+        <p>Delicious catering for your events, parties, and special occasions.</p>
+        <a href="services.php?category=catering" class="btn btn-light btn-sm mt-2">Learn More</a>
+      </div>
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#featureCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#featureCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
     <!-- Services Section -->
     <section class="services-section py-5 bg-light">
         <div class="container">
@@ -380,5 +485,12 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
     </footer>
     <script src="assets/js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+// Ensure carousel autoplay and pause on hover
+$('#featureCarousel').carousel({
+  interval: 3500,
+  pause: 'hover'
+});
+</script>
 </body>
 </html> 

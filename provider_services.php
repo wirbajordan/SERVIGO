@@ -62,7 +62,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 }
 
 // Bootstrap primary color (customize as needed)
-$primary = '#007bff';
+$primary = '#007bff';     
 $secondary = '#343a40';
 ?>
 <!DOCTYPE html>
