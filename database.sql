@@ -210,3 +210,7 @@ CREATE INDEX idx_messages_receiver ON messages(receiver_id);
 CREATE INDEX idx_notifications_user ON notifications(user_id);
 CREATE INDEX idx_provider_services_provider ON provider_services(provider_id);
 CREATE INDEX idx_provider_availability_provider ON provider_availability(provider_id);
+
+ALTER TABLE provider_documents
+ADD COLUMN status ENUM('pending','approved','rejected') DEFAULT 'pending' AFTER is_verified,
+ADD COLUMN rejection_reason TEXT NULL AFTER status;

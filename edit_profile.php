@@ -64,6 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $db->prepare("UPDATE service_providers SET business_name=?, business_description=?, experience_years=? WHERE user_id=?");
             $stmt->execute([$business_name, $business_description, $experience_years, $user_id]);
         }
+        // Refresh session data for immediate UI update
+        $_SESSION['first_name'] = $first_name;
+        $_SESSION['last_name'] = $last_name;
+        $_SESSION['profile_image'] = $profile_image;
         $success = 'Profile updated successfully!';
         // Refresh data
         header("Location: edit_profile.php?success=1");

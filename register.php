@@ -48,9 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $error = 'Email or username already exists.';
             } else {
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                $is_verified = ($user_type === 'provider') ? 0 : 1;
                 $stmt = $db->prepare("INSERT INTO users (username, email, password, first_name, last_name, phone, city, region, user_type, is_verified, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
-                    $username, $email, $hashed_password, $first_name, $last_name, format_phone($phone), $city, $region, $user_type, 1, 1
+                    $username, $email, $hashed_password, $first_name, $last_name, format_phone($phone), $city, $region, $user_type, $is_verified, 1
                 ]);
                 $user_id = $db->lastInsertId();
 
@@ -94,27 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body class="bg-light">
     <!-- Header -->
-    <header class="header navbar-servigo shadow-sm mb-4">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <div class="container">
-                <a class="navbar-brand text-primary-servigo fw-bold" href="index.php"><i class="fas fa-tools me-2"></i>ServiGo</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="mainNavbar">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
-                        <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
-                        <li class="nav-item"><a href="providers.php" class="nav-link">Service Providers</a></li>
-                        <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
-                        <li class="nav-item"><a href="contact.php" class="nav-link">Contact</a></li>
-                        <li class="nav-item"><a href="login.php" class="nav-link">Login</a></li>
-                        <li class="nav-item"><a href="register.php" class="nav-link active">Register</a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <?php include 'includes/site_header.php'; ?>
 
     <!-- Registration Section -->
     <section class="py-5">

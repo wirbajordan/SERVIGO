@@ -40,7 +40,9 @@ $primary = '#007bff';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Notifications | ServiGo</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background: #f8f9fa; }
         .notification-item { border-left: 4px solid transparent; }
@@ -48,8 +50,9 @@ $primary = '#007bff';
     </style>
 </head>
 <body>
+<?php include '_header.php'; ?>
 <div class="container py-5">
-    <h2 class="mb-4 text-center" style="color: <?php echo $primary; ?>;">Admin Notifications <span class="badge badge-primary"><?php echo $unread_count; ?> unread</span></h2>
+    <h2 class="mb-4" style="color: <?php echo $primary; ?>;">Admin Notifications <span class="badge bg-primary ms-2"><?php echo $unread_count; ?> unread</span></h2>
     <?php if ($success): ?>
         <div class="alert alert-success"> <?php echo $success; ?> </div>
     <?php elseif ($error): ?>
@@ -61,7 +64,7 @@ $primary = '#007bff';
                 <?php foreach ($notifications as $notif): ?>
                 <div class="notification-item p-3 mb-2 <?php echo $notif['is_read'] ? '' : 'unread'; ?>">
                     <h6><?php echo htmlspecialchars($notif['title']); ?></h6>
-                    <p><?php echo htmlspecialchars($notif['message']); ?></p>
+                    <p class="mb-1"><?php echo htmlspecialchars($notif['message']); ?></p>
                     <small class="text-muted"><?php echo date('M j, Y g:i a', strtotime($notif['created_at'])); ?></small>
                     <?php if (!$notif['is_read']): ?>
                     <form method="post" class="mt-2">
@@ -83,5 +86,6 @@ $primary = '#007bff';
         <a href="dashboard.php" class="btn btn-outline-primary">Back to Admin Dashboard</a>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 

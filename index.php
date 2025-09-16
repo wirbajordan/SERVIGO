@@ -54,32 +54,7 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
 </head>
 <body class="bg-light">
     <!-- Header -->
-    <header class="header navbar-servigo shadow-sm mb-4">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <div class="container">
-                <a class="navbar-brand text-primary-servigo fw-bold" href="index.php"><i class="fas fa-tools me-2"></i>ServiGo</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="mainNavbar">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a href="index.php" class="nav-link active">Home</a></li>
-                        <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
-                        <li class="nav-item"><a href="providers.php" class="nav-link">Service Providers</a></li>
-                        <li class="nav-item"><a href="about.php" class="nav-link">About</a></li>
-                        <li class="nav-item"><a href="contact.php" class="nav-link">Contact</a></li>
-                        <?php if(isset($_SESSION['user_id'])): ?>
-                            <li class="nav-item"><a href="dashboard.php" class="nav-link">Dashboard</a></li>
-                            <li class="nav-item"><a href="logout.php" class="nav-link">Logout</a></li>
-                        <?php else: ?>
-                            <li class="nav-item"><a href="login.php" class="nav-link">Login</a></li>
-                            <li class="nav-item"><a href="register.php" class="nav-link">Register</a></li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <?php include 'includes/site_header.php'; ?>
     <!-- Hero Section -->
     <section class="hero py-5 bg-primary-servigo text-white">
         <div class="container">
@@ -87,11 +62,11 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
                 <div class="col-md-6">
                     <h1 class="display-4 fw-bold mb-3">Find Local Services in Cameroon</h1>
                     <p class="lead mb-4">Connect with trusted professionals for all your service needs - from electricians to tutors, mechanics to cleaners.</p>
-                    <a href="services.php" class="btn btn-servigo btn-lg me-2 mb-2">Find Services</a>
-                    <a href="register.php" class="btn btn-success btn-lg mb-2">Become a Provider</a>
+                    <a href="services.php" class="btn btn-servigo btn-lg me-2 mb-2" style="font-size:1.25rem; padding:0.75em 2em;">Find Services</a>
+                    <a href="register.php" class="btn btn-success btn-lg mb-2" style="font-size:1.25rem; padding:0.75em 2em;">Become a Provider</a>
                 </div>
                 <div class="col-md-6 text-center">
-                    <img src="assets/images/electrician.jpeg" alt="Local Services" class="img-fluid rounded shadow">
+                    <img src="assets/images/electrician.jpeg" alt="Electrician at work - Local Services" class="img-fluid rounded shadow">
                 </div>
             </div>
         </div>
@@ -108,7 +83,7 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
   </div>
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="assets/images/tailoring1.jpeg" alt="Tailoring">
+      <img src="assets/images/tailoring1.jpeg" alt="Tailoring service - Custom clothes" />
       <div class="carousel-caption">
         <span class="carousel-service-icon"><i class="fas fa-cut"></i></span>
         <h5 class="d-inline">Tailoring</h5>
@@ -117,7 +92,7 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
       </div>
     </div>
     <div class="carousel-item">
-      <img src="assets/images/plumbering.jpeg" alt="Plumbering">
+      <img src="assets/images/plumbering.jpeg" alt="Plumbering service - Fixing pipes" />
       <div class="carousel-caption">
         <span class="carousel-service-icon"><i class="fas fa-wrench"></i></span>
         <h5 class="d-inline">Plumbering</h5>
@@ -126,7 +101,7 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
       </div>
     </div>
     <div class="carousel-item">
-      <img src="assets/images/mechanic.jpeg" alt="Mechanic">
+      <img src="assets/images/mechanic.jpeg" alt="Mechanic service - Car repair" />
       <div class="carousel-caption">
         <span class="carousel-service-icon"><i class="fas fa-car"></i></span>
         <h5 class="d-inline">Mechanic</h5>
@@ -135,7 +110,7 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
       </div>
     </div>
     <div class="carousel-item">
-      <img src="assets/images/capenters.jpeg" alt="Carpentry">
+      <img src="assets/images/capenters.jpeg" alt="Carpentry service - Woodwork" />
       <div class="carousel-caption">
         <span class="carousel-service-icon"><i class="fas fa-hammer"></i></span>
         <h5 class="d-inline">Carpentry</h5>
@@ -144,7 +119,7 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
       </div>
     </div>
     <div class="carousel-item">
-      <img src="assets/images/delivery services.jpeg" alt="Delivery">
+      <img src="assets/images/delivery services.jpeg" alt="Delivery service - Package delivery" />
       <div class="carousel-caption">
         <span class="carousel-service-icon"><i class="fas fa-truck"></i></span>
         <h5 class="d-inline">Delivery</h5>
@@ -153,7 +128,7 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
       </div>
     </div>
     <div class="carousel-item">
-      <img src="assets/images/catering.web" alt="Catering">
+      <img src="assets/images/catering.web" alt="Catering service - Event food" />
       <div class="carousel-caption">
         <span class="carousel-service-icon"><i class="fas fa-utensils"></i></span>
         <h5 class="d-inline">Catering</h5>
@@ -273,8 +248,11 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
                 <?php foreach ($latest_providers as $prov): ?>
                 <div class="col-md-3 col-sm-6">
                     <div class="card card-servigo text-center p-4 h-100">
-                        <img src="<?php echo $prov['profile_image'] ? htmlspecialchars($prov['profile_image']) : 'assets/images/default-profile.png'; ?>" class="rounded-circle mb-3" style="width:60px;height:60px;object-fit:cover;">
-                        <h3 class="h6 mb-1"><?php echo htmlspecialchars($prov['first_name'] . ' ' . $prov['last_name']); ?></h3>
+                        <img src="<?php echo $prov['profile_image'] ? htmlspecialchars($prov['profile_image']) : 'assets/images/default-profile.png'; ?>" class="rounded-circle mb-3" style="width:60px;height:60px;object-fit:cover;" alt="Provider profile image">
+                        <h3 class="h6 mb-1">
+                            <?php echo htmlspecialchars($prov['first_name'] . ' ' . $prov['last_name']); ?>
+                            <span class="verified-badge" title="Verified"><i class="fas fa-check"></i></span>
+                        </h3>
                         <div class="text-muted mb-1"><?php echo htmlspecialchars($prov['business_name']); ?></div>
                         <div class="small text-muted"><?php echo htmlspecialchars($prov['city']); ?>, <?php echo htmlspecialchars($prov['region']); ?></div>
                     </div>
@@ -409,8 +387,8 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
     <section class="cta-section py-5 bg-primary-servigo text-white text-center">
         <div class="container">
             <h2 class="mb-4">Ready to get started?</h2>
-            <a href="register.php" class="btn btn-success btn-lg me-3 mb-2">Become a Provider</a>
-            <a href="services.php" class="btn btn-outline-light btn-lg mb-2">Find a Service</a>
+            <a href="register.php" class="btn btn-success btn-lg me-3 mb-2" style="font-size:1.25rem; padding:0.75em 2em;">Become a Provider</a>
+            <a href="services.php" class="btn btn-outline-light btn-lg mb-2" style="font-size:1.25rem; padding:0.75em 2em;">Find a Service</a>
         </div>
     </section>
     <!-- FAQ Section -->

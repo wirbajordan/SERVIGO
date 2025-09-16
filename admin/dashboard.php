@@ -223,7 +223,8 @@ $unread_admin_notifications = $db->query("SELECT COUNT(*) FROM notifications WHE
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | ServiGo</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background: #f8f9fa; }
         .card-stat { border-left: 5px solid <?php echo $primary; ?>; }
@@ -231,7 +232,8 @@ $unread_admin_notifications = $db->query("SELECT COUNT(*) FROM notifications WHE
     </style>
 </head>
 <body>
-<div class="container py-5">
+<?php include '_header.php'; ?>
+<div class="container py-4">
     <h2 class="mb-4 text-center" style="color: <?php echo $primary; ?>;">Admin Dashboard</h2>
     <?php if ($success): ?>
         <div class="alert alert-success"> <?php echo $success; ?> </div>
@@ -279,6 +281,11 @@ $unread_admin_notifications = $db->query("SELECT COUNT(*) FROM notifications WHE
         </div>
         <div class="col-md-4 mb-2">
             <a href="?export=requests" class="btn btn-outline-primary w-100">Export Requests CSV</a>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-4 mb-2">
+            <a href="provider_verification.php" class="btn btn-warning w-100"><i class="fas fa-id-badge me-2"></i>Provider Verification</a>
         </div>
     </div>
     <?php if (count($pending_services) > 0): ?>
@@ -336,170 +343,43 @@ $unread_admin_notifications = $db->query("SELECT COUNT(*) FROM notifications WHE
     <div class="row">
         <div class="col-md-6 mb-4">
             <div class="card">
-                <div class="card-header"><strong>Recent Users</strong></div>
-                <div class="card-body p-0">
-                    <table class="table mb-0">
-                        <thead><tr><th>Name</th><th>Email</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody>
-                        <?php foreach ($users as $u): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($u['first_name'] . ' ' . $u['last_name']); ?></td>
-                                <td><?php echo htmlspecialchars($u['email']); ?></td>
-                                <td><?php echo ucfirst($u['user_type']); ?></td>
-                                <td><?php echo $u['is_active'] ? 'Active' : 'Inactive'; ?></td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#viewUserModal<?php echo $u['id']; ?>">View</button>
-                                    <!-- View User Modal -->
-                                    <div class="modal fade" id="viewUserModal<?php echo $u['id']; ?>" tabindex="-1" role="dialog" aria-labelledby="viewUserModalLabel<?php echo $u['id']; ?>" aria-hidden="true">
-                                      <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                          <div class="modal-header">
-                                            <h5 class="modal-title" id="viewUserModalLabel<?php echo $u['id']; ?>">User Details</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                              <span aria-hidden="true">&times;</span>
-                                            </button>
-                                          </div>
-                                          <div class="modal-body">
-                                            <ul class="list-group mb-3">
-                                              <li class="list-group-item"><strong>Name:</strong> <?php echo htmlspecialchars($u['first_name'] . ' ' . $u['last_name']); ?></li>
-                                              <li class="list-group-item"><strong>Email:</strong> <?php echo htmlspecialchars($u['email']); ?></li>
-                                              <li class="list-group-item"><strong>Type:</strong> <?php echo ucfirst($u['user_type']); ?></li>
-                                              <li class="list-group-item"><strong>Phone:</strong> <?php echo htmlspecialchars($u['phone']); ?></li>
-                                              <li class="list-group-item"><strong>City:</strong> <?php echo htmlspecialchars($u['city']); ?></li>
-                                              <li class="list-group-item"><strong>Region:</strong> <?php echo htmlspecialchars($u['region']); ?></li>
-                                              <li class="list-group-item"><strong>Status:</strong> <?php echo $u['is_active'] ? 'Active' : 'Inactive'; ?></li>
-                                              <li class="list-group-item"><strong>Created:</strong> <?php echo htmlspecialchars($u['created_at']); ?></li>
-                                            </ul>
-                                            <hr>
-                                            <h6>Reset Password</h6>
-                                            <form method="post">
-                                              <input type="hidden" name="user_id" value="<?php echo $u['id']; ?>">
-                                              <div class="form-group">
-                                                <input type="password" name="new_password" class="form-control" placeholder="New password (min 6 chars)" required>
-                                              </div>
-                                              <button type="submit" name="reset_password" class="btn btn-primary">Reset Password</button>
-                                            </form>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <form method="post" class="d-inline">
-                                        <input type="hidden" name="user_id" value="<?php echo $u['id']; ?>">
-                                        <input type="hidden" name="current_status" value="<?php echo $u['is_active']; ?>">
-                                        <button type="submit" name="toggle_user_status" class="btn btn-sm btn-<?php echo $u['is_active'] ? 'warning' : 'success'; ?>">
-                                            <?php echo $u['is_active'] ? 'Deactivate' : 'Activate'; ?>
-                                        </button>
-                                    </form>
-                                    <form method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?');">
-                                        <input type="hidden" name="user_id" value="<?php echo $u['id']; ?>">
-                                        <button type="submit" name="delete_user" class="btn btn-sm btn-danger">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>Recent Users</strong>
+                    <a href="users.php" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <?php foreach (array_slice($users, 0, 5) as $u): ?>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><?php echo htmlspecialchars($u['first_name'] . ' ' . $u['last_name']); ?> (<?php echo ucfirst($u['user_type']); ?>)</span>
+                                <span class="badge bg-<?php echo $u['is_active'] ? 'success' : 'secondary'; ?>"><?php echo $u['is_active'] ? 'Active' : 'Inactive'; ?></span>
+                            </li>
                         <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                        <?php if (empty($users)): ?>
+                            <li class="list-group-item text-muted">No recent users.</li>
+                        <?php endif; ?>
+                    </ul>
                 </div>
             </div>
         </div>
         <div class="col-md-6 mb-4">
             <div class="card">
-                <div class="card-header"><strong>Recent Services</strong></div>
-                <div class="card-body p-0">
-                    <table class="table mb-0">
-                        <thead><tr><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody>
-                        <?php foreach ($services as $s): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($s['name']); ?></td>
-                                <td><?php echo htmlspecialchars($s['description']); ?></td>
-                                <td><?php echo $s['is_active'] ? 'Active' : 'Inactive'; ?></td>
-                                <td>
-                                    <form method="post" class="d-inline">
-                                        <input type="hidden" name="service_id" value="<?php echo $s['id']; ?>">
-                                        <input type="hidden" name="current_status" value="<?php echo $s['is_active']; ?>">
-                                        <button type="submit" name="toggle_service_status" class="btn btn-sm btn-<?php echo $s['is_active'] ? 'warning' : 'success'; ?>">
-                                            <?php echo $s['is_active'] ? 'Deactivate' : 'Activate'; ?>
-                                        </button>
-                                    </form>
-                                    <!-- Edit button triggers modal -->
-                                    <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#editServiceModal<?php echo $s['id']; ?>">Edit</button>
-                                    <form method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this service?');">
-                                        <input type="hidden" name="service_id" value="<?php echo $s['id']; ?>">
-                                        <button type="submit" name="delete_service" class="btn btn-sm btn-danger">Delete</button>
-                                    </form>
-                                    <!-- Edit Modal -->
-                                    <div class="modal fade" id="editServiceModal<?php echo $s['id']; ?>" tabindex="-1" role="dialog" aria-labelledby="editServiceModalLabel<?php echo $s['id']; ?>" aria-hidden="true">
-                                      <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                          <form method="post">
-                                            <div class="modal-header">
-                                              <h5 class="modal-title" id="editServiceModalLabel<?php echo $s['id']; ?>">Edit Service</h5>
-                                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                              </button>
-                                            </div>
-                                            <div class="modal-body">
-                                              <input type="hidden" name="service_id" value="<?php echo $s['id']; ?>">
-                                              <div class="form-group">
-                                                <label>Name</label>
-                                                <input type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($s['name']); ?>" required>
-                                              </div>
-                                              <div class="form-group">
-                                                <label>Description</label>
-                                                <textarea name="description" class="form-control" required><?php echo htmlspecialchars($s['description']); ?></textarea>
-                                              </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                              <button type="submit" name="edit_service" class="btn btn-primary">Save Changes</button>
-                                            </div>
-                                          </form>
-                                        </div>
-                                      </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>Recent Service Requests</strong>
+                    <a href="requests.php" class="btn btn-sm btn-primary">View All</a>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-header"><strong>Recent Service Requests</strong></div>
-                <div class="card-body p-0">
-                    <table class="table mb-0">
-                        <thead><tr><th>Customer</th><th>Title</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
-                        <tbody>
-                        <?php foreach ($requests as $r): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($r['first_name'] . ' ' . $r['last_name']); ?></td>
-                                <td><?php echo htmlspecialchars($r['title']); ?></td>
-                                <td><?php echo ucfirst($r['status']); ?></td>
-                                <td><?php echo date('M j, Y', strtotime($r['created_at'])); ?></td>
-                                <td>
-                                    <form method="post" class="d-inline">
-                                        <input type="hidden" name="request_id" value="<?php echo $r['id']; ?>">
-                                        <select name="new_status" class="form-select form-select-sm d-inline w-auto">
-                                            <?php foreach (["pending","accepted","in_progress","completed","cancelled"] as $status): ?>
-                                                <option value="<?php echo $status; ?>" <?php if ($r['status'] === $status) echo 'selected'; ?>><?php echo ucfirst($status); ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <button type="submit" name="change_request_status" class="btn btn-sm btn-primary">Update</button>
-                                    </form>
-                                    <form method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this request?');">
-                                        <input type="hidden" name="request_id" value="<?php echo $r['id']; ?>">
-                                        <button type="submit" name="delete_request" class="btn btn-sm btn-danger">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <?php foreach (array_slice($requests, 0, 5) as $r): ?>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><?php echo htmlspecialchars($r['first_name'] . ' ' . $r['last_name']); ?> - <?php echo htmlspecialchars($r['title']); ?></span>
+                                <span class="badge bg-info text-dark"><?php echo ucfirst($r['status']); ?></span>
+                            </li>
                         <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                        <?php if (empty($requests)): ?>
+                            <li class="list-group-item text-muted">No recent requests.</li>
+                        <?php endif; ?>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -507,21 +387,22 @@ $unread_admin_notifications = $db->query("SELECT COUNT(*) FROM notifications WHE
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header bg-secondary text-white"><strong>Recent Audit Logs</strong></div>
+                <div class="card-header d-flex justify-content-between align-items-center bg-secondary text-white">
+                    <strong>Recent Audit Logs</strong>
+                    <a href="audits.php" class="btn btn-sm btn-light">View All</a>
+                </div>
                 <div class="card-body p-0">
-                    <table class="table mb-0">
-                        <thead><tr><th>Admin</th><th>Action</th><th>Details</th><th>Date</th></tr></thead>
-                        <tbody>
-                        <?php foreach ($audit_logs as $log): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($log['first_name'] . ' ' . $log['last_name']); ?></td>
-                                <td><?php echo htmlspecialchars($log['action']); ?></td>
-                                <td><?php echo htmlspecialchars($log['details']); ?></td>
-                                <td><?php echo date('M j, Y g:i a', strtotime($log['created_at'])); ?></td>
-                            </tr>
+                    <ul class="list-group list-group-flush">
+                        <?php foreach (array_slice($audit_logs, 0, 5) as $log): ?>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><?php echo htmlspecialchars($log['first_name'] . ' ' . $log['last_name']); ?> - <?php echo htmlspecialchars($log['action']); ?></span>
+                                <small class="text-muted"><?php echo date('M j, Y g:i a', strtotime($log['created_at'])); ?></small>
+                            </li>
                         <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                        <?php if (empty($audit_logs)): ?>
+                            <li class="list-group-item text-muted">No recent audit logs.</li>
+                        <?php endif; ?>
+                    </ul>
                 </div>
             </div>
         </div>

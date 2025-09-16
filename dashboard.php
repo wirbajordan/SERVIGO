@@ -29,49 +29,42 @@ if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-    <!-- Header -->
-    <header class="header navbar-servigo shadow-sm mb-4">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white">
-            <div class="container">
-                <a class="navbar-brand text-primary-servigo fw-bold" href="index.php"><i class="fas fa-tools me-2"></i>ServiGo</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="mainNavbar">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
-                        <li class="nav-item"><a href="services.php" class="nav-link">Services</a></li>
-                        <li class="nav-item"><a href="providers.php" class="nav-link">Service Providers</a></li>
-                        <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'provider'): ?>
-                        <li class="nav-item"><a href="provider_services.php" class="nav-link">My Services</a></li>
-                        <?php endif; ?>
-                        <li class="nav-item"><a href="dashboard.php" class="nav-link active">Dashboard</a></li>
-                        <li class="nav-item"><a href="edit_profile.php" class="nav-link">Edit Profile</a></li>
-                        <li class="nav-item"><a href="request_service.php" class="nav-link">Request Service</a></li>
-                        <li class="nav-item"><a href="messages.php" class="nav-link">Messages</a></li>
-                        <li class="nav-item"><a href="notifications.php" class="nav-link">Notifications</a></li>
-                        <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin'): ?>
-                        <li class="nav-item">
-                            <a href="admin/notifications.php" class="nav-link">
-                                Admin Notifications
+    <?php include 'includes/site_header.php'; ?>
+
+    <section class="py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header fw-semibold">My Menu</div>
+                        <div class="list-group list-group-flush">
+                            <a href="dashboard.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-home me-2"></i>Dashboard</a>
+                            <a href="edit_profile.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-user-edit me-2"></i>Edit Profile</a>
+                            <a href="request_service.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-calendar-check me-2"></i>Request Service</a>
+                            <a href="messages.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-comments me-2"></i>Messages</a>
+                            <a href="notifications.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-bell me-2"></i>Notifications</a>
+                            <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'provider'): ?>
+                            <div class="border-top"></div>
+                            <a href="provider_dashboard.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-briefcase me-2"></i>Provider Dashboard</a>
+                            <a href="provider_services.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-tools me-2"></i>My Services</a>
+                            <?php endif; ?>
+                            <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin'): ?>
+                            <div class="border-top"></div>
+                            <a href="admin/dashboard.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-gauge-high me-2"></i>Admin Dashboard</a>
+                            <a href="admin/notifications.php" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-bell me-2"></i>Admin Notifications
                                 <?php if ($unread_admin_notifications > 0): ?>
-                                    <span class="badge bg-danger ms-1"><?php echo $unread_admin_notifications; ?></span>
+                                    <span class="badge bg-danger ms-auto"><?php echo $unread_admin_notifications; ?></span>
                                 <?php endif; ?>
                             </a>
-                        </li>
-                        <li class="nav-item"><a href="admin/dashboard.php" class="nav-link">Admin Dashboard</a></li>
-                        <?php endif; ?>
-                        <li class="nav-item"><a href="logout.php" class="nav-link">Logout</a></li>
-                    </ul>
+                            <?php endif; ?>
+                            <div class="border-top"></div>
+                            <a href="logout.php" class="list-group-item list-group-item-action d-flex align-items-center text-danger"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </nav>
-    </header>
-    <section class="py-5">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-8 col-lg-6">
-                    <div class="card card-servigo shadow">
+                <div class="col-lg-9">
+                    <div class="card card-servigo shadow mb-4">
                         <div class="card-body p-5 text-center">
                             <h2 class="text-primary-servigo fw-bold mb-3">Welcome, <?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>!</h2>
                             <p class="mb-2">Your user type: <span class="badge bg-success-servigo text-uppercase ms-1"><?php echo ucfirst($user['user_type']); ?></span></p>
@@ -82,24 +75,14 @@ if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin') {
                             <a href="logout.php" class="btn btn-secondary">Logout</a>
                         </div>
                     </div>
+                    <div class="text-center my-4">
+                        <a href="pay.php" class="btn btn-success btn-lg">Make a Payment</a>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
-    <!-- Add this button at the top or where appropriate in your dashboard -->
-    <div class="text-center my-4">
-        <a href="pay.php" class="btn btn-success btn-lg">Make a Payment</a>
-    </div>
-    <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'provider'): ?>
-    <div class="text-center my-4">
-        <a href="provider_dashboard.php" class="btn btn-primary btn-lg">Provider Dashboard</a>
-    </div>
-    <?php endif; ?>
-    <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'customer'): ?>
-    <div class="text-center my-4">
-        <a href="customer_dashboard.php" class="btn btn-primary btn-lg">Customer Dashboard</a>
-    </div>
-    <?php endif; ?>
+
     <footer class="footer bg-neutral-dark text-white mt-5">
         <div class="container py-4">
             <div class="row">
