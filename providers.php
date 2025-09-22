@@ -91,6 +91,7 @@ $primary = '#007bff';
         <?php if (count($providers) > 0): ?>
             <?php foreach ($providers as $prov): ?>
             <div class="col-md-4 mb-4">
+                <a href="provider_profile.php?id=<?php echo $prov['id']; ?>" class="text-decoration-none text-reset">
                 <div class="provider-card p-4 h-100 d-flex flex-column justify-content-between">
                     <div class="d-flex align-items-center mb-3">
                         <img src="<?php echo $prov['profile_image'] ? htmlspecialchars($prov['profile_image']) : 'assets/images/default-profile.png'; ?>" class="profile-img me-3" alt="Profile">
@@ -104,7 +105,14 @@ $primary = '#007bff';
                         <span class="fw-bold ms-3">Region:</span> <?php echo htmlspecialchars($prov['region']); ?>
                     </div>
                     <div class="mb-2">
-                        <span class="fw-bold">Rating:</span> <span class="text-warning"><i class="fas fa-star"></i></span> <?php echo htmlspecialchars($prov['rating']); ?>
+                        <span class="fw-bold">Rating:</span>
+                        <span class="text-warning">
+                            <?php $r = (int)round($prov['rating']); for ($i=0; $i<5; $i++): ?>
+                                <i class="fas fa-star<?php echo $i < $r ? '' : '-o'; ?>"></i>
+                            <?php endfor; ?>
+                        </span>
+                        <span class="ms-1"><?php echo number_format((float)$prov['rating'], 1); ?></span>
+                        <small class="text-muted ms-1">(<?php echo (int)($prov['total_reviews'] ?? 0); ?>)</small>
                     </div>
                     <div class="mb-2">
                         <span class="fw-bold">Services:</span><br>
@@ -114,6 +122,7 @@ $primary = '#007bff';
                         <?php endforeach; ?>
                     </div>
                 </div>
+                </a>
             </div>
             <?php endforeach; ?>
         <?php else: ?>
