@@ -86,6 +86,20 @@ $rejected_docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body class="bg-light">
 <?php include '_header.php'; ?>
 <div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="dashboard.php">Admin Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Provider Verification</li>
+        </ol>
+    </nav>
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        <a href="dashboard.php" class="btn btn-sm btn-outline-primary"><i class="fas fa-gauge-high me-1"></i> Dashboard</a>
+        <a href="users.php" class="btn btn-sm btn-outline-primary"><i class="fas fa-users me-1"></i> Users</a>
+        <a href="requests.php" class="btn btn-sm btn-outline-primary"><i class="fas fa-clipboard-list me-1"></i> Requests</a>
+        <a href="provider_verification.php" class="btn btn-sm btn-warning"><i class="fas fa-id-badge me-1"></i> Provider Verification</a>
+        <a href="notifications.php" class="btn btn-sm btn-outline-secondary"><i class="fas fa-bell me-1"></i> Notifications</a>
+        <a href="audits.php" class="btn btn-sm btn-outline-dark"><i class="fas fa-clipboard-check me-1"></i> Audit Logs</a>
+    </div>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Provider Document Verification</h2>
         <a href="dashboard.php" class="btn btn-outline-secondary">Back to Dashboard</a>

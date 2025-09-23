@@ -52,6 +52,7 @@ $total_spent = $stmt->fetchColumn() ?: 0;
                 <div class="card-header fw-semibold">Customer Menu</div>
                 <div class="list-group list-group-flush">
                     <a href="customer_dashboard.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-gauge-high me-2"></i>Overview</a>
+                    <a href="request_service.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-calendar-check me-2"></i>Book a Service</a>
                     <a href="customer_requests.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-clipboard-list me-2"></i>My Requests</a>
                     <a href="pay.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-money-bill me-2"></i>Payments</a>
                     <a href="messages.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-comments me-2"></i>Messages</a>

@@ -3,8 +3,16 @@ session_start();
 require_once 'config/database.php';
 
 // Redirect if already logged in
-if(isset($_SESSION['user_id'])) {
-    header("Location: dashboard.php");
+if (isset($_SESSION['user_id'])) {
+    if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin') {
+        header('Location: admin/dashboard.php');
+    } elseif (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'provider') {
+        header('Location: provider_dashboard.php');
+    } elseif (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'customer') {
+        header('Location: customer_dashboard.php');
+    } else {
+        header('Location: dashboard.php');
+    }
     exit();
 }
 
@@ -31,7 +39,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $_SESSION['last_name'] = $user['last_name'];
                 $_SESSION['profile_image'] = $user['profile_image'];
                 
-                header("Location: dashboard.php");
+                // Route by user type after successful login
+                if ($user['user_type'] === 'admin') {
+                    header('Location: admin/dashboard.php');
+                } elseif ($user['user_type'] === 'provider') {
+                    header('Location: provider_dashboard.php');
+                } elseif ($user['user_type'] === 'customer') {
+                    header('Location: customer_dashboard.php');
+                } else {
+                    header('Location: dashboard.php');
+                }
                 exit();
             } else {
                 $error = 'Invalid email or password';

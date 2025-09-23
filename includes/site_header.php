@@ -6,6 +6,12 @@ function site_avatar_path($path) {
   if (strpos($path, '/') === 0) return $path;
   return '/SERVIGO/' . ltrim($path, '/');
 }
+function site_link_active($absPath) {
+  $uri = $_SERVER['REQUEST_URI'] ?? '';
+  // Ensure query string doesn't affect match
+  $uri = strtok($uri, '?');
+  return $uri === $absPath;
+}
 ?>
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
   <div class="container">
@@ -20,11 +26,11 @@ function site_avatar_path($path) {
       </div>
       <div class="offcanvas-body">
         <ul class="navbar-nav me-auto">
-          <li class="nav-item"><a href="/SERVIGO/index.php" class="nav-link">Home</a></li>
-          <li class="nav-item"><a href="/SERVIGO/services.php" class="nav-link">Services</a></li>
-          <li class="nav-item"><a href="/SERVIGO/providers.php" class="nav-link">Service Providers</a></li>
-          <li class="nav-item"><a href="/SERVIGO/about.php" class="nav-link">About</a></li>
-          <li class="nav-item"><a href="/SERVIGO/contact.php" class="nav-link">Contact</a></li>
+          <li class="nav-item"><a href="/SERVIGO/index.php" class="nav-link<?php echo site_link_active('/SERVIGO/index.php') ? ' active' : ''; ?>" aria-current="<?php echo site_link_active('/SERVIGO/index.php') ? 'page' : 'false'; ?>">Home</a></li>
+          <li class="nav-item"><a href="/SERVIGO/services.php" class="nav-link<?php echo site_link_active('/SERVIGO/services.php') ? ' active' : ''; ?>" aria-current="<?php echo site_link_active('/SERVIGO/services.php') ? 'page' : 'false'; ?>">Services</a></li>
+          <li class="nav-item"><a href="/SERVIGO/providers.php" class="nav-link<?php echo site_link_active('/SERVIGO/providers.php') ? ' active' : ''; ?>" aria-current="<?php echo site_link_active('/SERVIGO/providers.php') ? 'page' : 'false'; ?>">Service Providers</a></li>
+          <li class="nav-item"><a href="/SERVIGO/about.php" class="nav-link<?php echo site_link_active('/SERVIGO/about.php') ? ' active' : ''; ?>" aria-current="<?php echo site_link_active('/SERVIGO/about.php') ? 'page' : 'false'; ?>">About</a></li>
+          <li class="nav-item"><a href="/SERVIGO/contact.php" class="nav-link<?php echo site_link_active('/SERVIGO/contact.php') ? ' active' : ''; ?>" aria-current="<?php echo site_link_active('/SERVIGO/contact.php') ? 'page' : 'false'; ?>">Contact</a></li>
         </ul>
         <ul class="navbar-nav ms-auto">
           <?php if(isset($_SESSION['user_id'])): ?>
@@ -37,6 +43,7 @@ function site_avatar_path($path) {
                 <li><a class="dropdown-item" href="/SERVIGO/dashboard.php">Dashboard</a></li>
                 <li><a class="dropdown-item" href="/SERVIGO/edit_profile.php">Edit Profile</a></li>
                 <?php if(isset($_SESSION['user_type']) && $_SESSION['user_type']==='admin'): ?>
+                <li><a class="dropdown-item" href="/SERVIGO/dashboard.php?main=1">Main Dashboard</a></li>
                 <li><a class="dropdown-item" href="/SERVIGO/admin/dashboard.php">Admin Dashboard</a></li>
                 <?php endif; ?>
                 <li><hr class="dropdown-divider"></li>

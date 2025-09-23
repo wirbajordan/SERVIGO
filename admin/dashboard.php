@@ -234,7 +234,17 @@ $unread_admin_notifications = $db->query("SELECT COUNT(*) FROM notifications WHE
 <body>
 <?php include '_header.php'; ?>
 <div class="container py-4">
-    <h2 class="mb-4 text-center" style="color: <?php echo $primary; ?>;">Admin Dashboard</h2>
+    <h2 class="mb-3 text-center" style="color: <?php echo $primary; ?>;">Admin Dashboard</h2>
+    <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+        <a href="users.php" class="btn btn-sm btn-outline-primary me-2 mb-2"><i class="fas fa-users me-1"></i> Users</a>
+        <a href="requests.php" class="btn btn-sm btn-outline-primary me-2 mb-2"><i class="fas fa-clipboard-list me-1"></i> Requests</a>
+        <a href="provider_verification.php" class="btn btn-sm btn-outline-warning me-2 mb-2"><i class="fas fa-id-badge me-1"></i> Provider Verification</a>
+        <a href="notifications.php" class="btn btn-sm btn-outline-secondary me-2 mb-2"><i class="fas fa-bell me-1"></i> Notifications</a>
+        <a href="audits.php" class="btn btn-sm btn-outline-dark me-2 mb-2"><i class="fas fa-clipboard-check me-1"></i> Audit Logs</a>
+        <a href="../dashboard.php?main=1" class="btn btn-sm btn-outline-success me-2 mb-2"><i class="fas fa-gauge-high me-1"></i> Main Dashboard</a>
+        <a href="../index.php" class="btn btn-sm btn-outline-success me-2 mb-2"><i class="fas fa-house me-1"></i> Welcome Page</a>
+    </div>
+
     <?php if ($success): ?>
         <div class="alert alert-success"> <?php echo $success; ?> </div>
     <?php elseif ($error): ?>

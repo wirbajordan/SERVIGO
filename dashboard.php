@@ -8,10 +8,17 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Redirect providers to provider dashboard
-if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'provider') {
-    header('Location: provider_dashboard.php');
-    exit();
+// Redirect admins and providers to their respective dashboards
+// Admins can bypass this redirect with ?main=1 to view the generic dashboard
+$bypassMain = isset($_GET['main']) && $_GET['main'] == '1';
+if (isset($_SESSION['user_type'])) {
+    if ($_SESSION['user_type'] === 'admin' && !$bypassMain) {
+        header('Location: admin/dashboard.php');
+        exit();
+    } elseif ($_SESSION['user_type'] === 'provider') {
+        header('Location: provider_dashboard.php');
+        exit();
+    }
 }
 
 $db = getDB();
@@ -57,12 +64,27 @@ $suggested_providers = $stmt->fetchAll();
 <head>
     <meta charset="UTF-8">
     <title>Customer Dashboard | ServiGo</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
+<?php include 'includes/site_header.php'; ?>
 <div class="container py-5">
-    <h2 class="mb-4 text-center">Welcome, <?php echo htmlspecialchars(($customer['first_name'] ?? '') . ' ' . ($customer['last_name'] ?? '')); ?></h2>
+    <h2 class="mb-2 text-center">Welcome, <?php echo htmlspecialchars(($customer['first_name'] ?? '') . ' ' . ($customer['last_name'] ?? '')); ?></h2>
+    <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'customer'): ?>
+        <div class="text-center mb-4">
+            <a href="customer_dashboard.php" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-arrow-left me-1"></i> Go to Customer Dashboard (with menu)
+            </a>
+        </div>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin' && $bypassMain): ?>
+        <div class="text-center mb-4">
+            <a href="admin/dashboard.php" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to Admin Dashboard
+            </a>
+        </div>
+    <?php endif; ?>
 
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
@@ -158,15 +180,15 @@ $suggested_providers = $stmt->fetchAll();
                                 <td><?php echo htmlspecialchars($r['title']); ?></td>
                                 <td><?php echo htmlspecialchars($r['category_name']); ?></td>
                                 <td><?php echo htmlspecialchars($r['first_name'] . ' ' . $r['last_name']); ?></td>
-                                <td><span class="badge badge-<?php
+                                <td><span class="badge <?php
                                     switch($r['status']){
-                                        case 'pending': echo 'warning'; break;
-                                        case 'accepted': echo 'primary'; break;
-                                        case 'in_progress': echo 'info'; break;
-                                        case 'completed': echo 'success'; break;
-                                        case 'cancelled': echo 'secondary'; break;
-                                        case 'declined': echo 'danger'; break;
-                                        default: echo 'light';
+                                        case 'pending': echo 'bg-warning'; break;
+                                        case 'accepted': echo 'bg-primary'; break;
+                                        case 'in_progress': echo 'bg-info text-dark'; break;
+                                        case 'completed': echo 'bg-success'; break;
+                                        case 'cancelled': echo 'bg-secondary'; break;
+                                        case 'declined': echo 'bg-danger'; break;
+                                        default: echo 'bg-light text-dark';
                                     }
                                 ?>"><?php echo ucfirst($r['status']); ?></span></td>
                                 <td><?php echo format_datetime($r['created_at']); ?></td>
@@ -204,6 +226,6 @@ $suggested_providers = $stmt->fetchAll();
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 

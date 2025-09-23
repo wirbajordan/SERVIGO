@@ -7,10 +7,15 @@ function admin_avatar_path($path) {
   // Stored relative path like assets/images/...
   return '/SERVIGO/' . ltrim($path, '/');
 }
+function admin_link_active($absPath) {
+  $uri = $_SERVER['REQUEST_URI'] ?? '';
+  $uri = strtok($uri, '?');
+  return $uri === $absPath;
+}
 ?>
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
   <div class="container">
-    <a class="navbar-brand fw-bold text-primary-servigo" href="../index.php">
+    <a class="navbar-brand fw-bold text-primary-servigo" href="/SERVIGO/index.php">
       <i class="fas fa-tools me-2"></i>ServiGo
     </a>
 
@@ -25,7 +30,12 @@ function admin_avatar_path($path) {
       </div>
       <div class="offcanvas-body">
         <ul class="navbar-nav me-auto">
-          <li class="nav-item"><a class="nav-link" href="dashboard.php">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link<?php echo admin_link_active('/SERVIGO/index.php') ? ' active' : ''; ?>" href="/SERVIGO/index.php" aria-current="<?php echo admin_link_active('/SERVIGO/index.php') ? 'page' : 'false'; ?>">Home</a></li>
+          <li class="nav-item"><a class="nav-link<?php echo admin_link_active('/SERVIGO/services.php') ? ' active' : ''; ?>" href="/SERVIGO/services.php" aria-current="<?php echo admin_link_active('/SERVIGO/services.php') ? 'page' : 'false'; ?>">Services</a></li>
+          <li class="nav-item"><a class="nav-link<?php echo admin_link_active('/SERVIGO/providers.php') ? ' active' : ''; ?>" href="/SERVIGO/providers.php" aria-current="<?php echo admin_link_active('/SERVIGO/providers.php') ? 'page' : 'false'; ?>">Service Providers</a></li>
+          <li class="nav-item"><a class="nav-link<?php echo admin_link_active('/SERVIGO/about.php') ? ' active' : ''; ?>" href="/SERVIGO/about.php" aria-current="<?php echo admin_link_active('/SERVIGO/about.php') ? 'page' : 'false'; ?>">About</a></li>
+          <li class="nav-item"><a class="nav-link<?php echo admin_link_active('/SERVIGO/contact.php') ? ' active' : ''; ?>" href="/SERVIGO/contact.php" aria-current="<?php echo admin_link_active('/SERVIGO/contact.php') ? 'page' : 'false'; ?>">Contact</a></li>
+          <li class="nav-item"><a class="nav-link<?php echo admin_link_active('/SERVIGO/admin/dashboard.php') ? ' active' : ''; ?>" href="/SERVIGO/admin/dashboard.php" aria-current="<?php echo admin_link_active('/SERVIGO/admin/dashboard.php') ? 'page' : 'false'; ?>">Dashboard</a></li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Admin</a>
             <ul class="dropdown-menu" aria-labelledby="adminDropdown">
@@ -50,6 +60,9 @@ function admin_avatar_path($path) {
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
               <li><a class="dropdown-item" href="../dashboard.php">My Dashboard</a></li>
+              <?php if(isset($_SESSION['user_type']) && $_SESSION['user_type']==='admin'): ?>
+              <li><a class="dropdown-item" href="../dashboard.php?main=1">Main Dashboard</a></li>
+              <?php endif; ?>
               <li><a class="dropdown-item" href="../edit_profile.php">Edit Profile</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item text-danger" href="../logout.php">Logout</a></li>

@@ -4,6 +4,16 @@ if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit();
 }
+
+// Determine back URL based on user type
+$backUrl = 'dashboard.php';
+if (isset($_SESSION['user_type'])) {
+    if ($_SESSION['user_type'] === 'customer') {
+        $backUrl = 'customer_dashboard.php';
+    } elseif ($_SESSION['user_type'] === 'provider') {
+        $backUrl = 'provider_dashboard.php';
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -11,11 +21,17 @@ if (!isset($_SESSION['user_id'])) {
     <meta charset="UTF-8">
     <title>Pay with Mobile Money, Card, or Bank</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="bg-light">
 <div class="container py-5">
     <div class="card mx-auto" style="max-width: 400px;">
         <div class="card-body">
+            <div class="mb-3 text-center">
+                <a href="<?php echo htmlspecialchars($backUrl); ?>" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Dashboard
+                </a>
+            </div>
             <h3 class="mb-4 text-center">Make a Payment</h3>
             <form method="post" action="process_payment.php">
                 <div class="form-group">
