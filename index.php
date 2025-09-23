@@ -34,7 +34,7 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
         }
         .carousel-item img {
             object-fit: cover;
-            height: 400px;
+            height: 280px;
             width: 100%;
         }
         .carousel-service-icon {
@@ -48,8 +48,14 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
         }
         @media (max-width: 768px) {
             .carousel-caption { padding: 1rem; font-size: 0.95rem; }
-            .carousel-item img { height: 220px; }
+            .carousel-item img { height: 160px; }
         }
+        .hero { overflow: hidden; }
+        .hero .content-col { position: relative; z-index: 2; }
+        .hero-images { display: flex; gap: 12px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
+        .hero-images img { border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.15); height: 200px; width: auto; max-width: 48%; }
+        @media (max-width: 992px) { .hero-images img { height: 180px; max-width: 48%; } }
+        @media (max-width: 768px) { .hero-images { justify-content: center; } .hero-images img { height: 120px; max-width: 48%; } }
     </style>
 </head>
 <body class="bg-light">
@@ -59,14 +65,17 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
     <section class="hero py-5 bg-primary-servigo text-white">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-6">
+                <div class="col-md-6 content-col">
                     <h1 class="display-4 fw-bold mb-3">Find Local Services in Cameroon</h1>
                     <p class="lead mb-4">Connect with trusted professionals for all your service needs - from electricians to tutors, mechanics to cleaners.</p>
                     <a href="services.php" class="btn btn-servigo btn-lg me-2 mb-2" style="font-size:1.25rem; padding:0.75em 2em;">Find Services</a>
                     <a href="register.php" class="btn btn-success btn-lg mb-2" style="font-size:1.25rem; padding:0.75em 2em;">Become a Provider</a>
                 </div>
                 <div class="col-md-6 text-center">
-                    <img src="assets/images/electrician.jpeg" alt="Electrician at work - Local Services" class="img-fluid rounded shadow">
+                    <div class="hero-images">
+                        <img src="assets/images/electrician.jpeg" alt="Electrician at work - Local Services" class="img-fluid">
+                        <img src="assets/images/cleaning services.jpeg" alt="Cleaning service - Home and office cleaning" class="img-fluid">
+                    </div>
                 </div>
             </div>
         </div>
@@ -80,60 +89,167 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
     <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
     <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="4" aria-label="Slide 5"></button>
     <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="5" aria-label="Slide 6"></button>
+    <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="6" aria-label="Slide 7"></button>
+    <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="7" aria-label="Slide 8"></button>
+    <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="8" aria-label="Slide 9"></button>
+    <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="9" aria-label="Slide 10"></button>
+    <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="10" aria-label="Slide 11"></button>
+    <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="11" aria-label="Slide 12"></button>
+    <button type="button" data-bs-target="#featureCarousel" data-bs-slide-to="12" aria-label="Slide 13"></button>
   </div>
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="assets/images/tailoring1.jpeg" alt="Tailoring service - Custom clothes" />
-      <div class="carousel-caption">
-        <span class="carousel-service-icon"><i class="fas fa-cut"></i></span>
-        <h5 class="d-inline">Tailoring</h5>
-        <p>Get custom clothes made or repaired by local tailoring experts.</p>
-        <a href="services.php?category=tailoring" class="btn btn-light btn-sm mt-2">Learn More</a>
+      <div class="row justify-content-center align-items-end">
+        <div class="col-md-6 text-center">
+          <img src="assets/images/tailoring1.jpeg" alt="Tailoring service - Custom clothes" class="carousel-img" />
+          <div class="carousel-desc mt-3">
+            <span class="carousel-service-icon"><i class="fas fa-cut"></i></span>
+            <h5 class="d-inline">Tailoring</h5>
+            <p>Get custom clothes made or repaired by local tailoring experts.</p>
+            <a href="services.php?category=Tailoring" class="btn btn-light btn-sm mt-2">Learn More</a>
+          </div>
+        </div>
+        <div class="col-md-6 text-center">
+          <img src="assets/images/plumbering1.jpeg" alt="Plumbering service - Fixing pipes" class="carousel-img" />
+          <div class="carousel-desc mt-3">
+            <span class="carousel-service-icon"><i class="fas fa-wrench"></i></span>
+            <h5 class="d-inline">Plumbering</h5>
+            <p>Fix leaks, install pipes, and solve all your plumbing issues quickly.</p>
+            <a href="services.php?category=Plumbering" class="btn btn-light btn-sm mt-2">Learn More</a>
+          </div>
+        </div>
       </div>
     </div>
     <div class="carousel-item">
-      <img src="assets/images/plumbering.jpeg" alt="Plumbering service - Fixing pipes" />
-      <div class="carousel-caption">
-        <span class="carousel-service-icon"><i class="fas fa-wrench"></i></span>
-        <h5 class="d-inline">Plumbering</h5>
-        <p>Fix leaks, install pipes, and solve all your plumbing issues quickly.</p>
-        <a href="services.php?category=plumbering" class="btn btn-light btn-sm mt-2">Learn More</a>
+      <div class="row justify-content-center align-items-end">
+        <div class="col-md-6 text-center">
+          <img src="assets/images/mechanic.jpeg" alt="Mechanic service - Car repair" class="carousel-img" />
+          <div class="carousel-desc mt-3">
+            <span class="carousel-service-icon"><i class="fas fa-car"></i></span>
+            <h5 class="d-inline">Mechanic</h5>
+            <p>Professional mechanics for car repairs and maintenance at your convenience.</p>
+            <a href="services.php?category=Mechanic" class="btn btn-light btn-sm mt-2">Learn More</a>
+          </div>
+        </div>
+        <div class="col-md-6 text-center">
+          <img src="assets/images/capenters.jpeg" alt="Carpentry service - Woodwork" class="carousel-img" />
+          <div class="carousel-desc mt-3">
+            <span class="carousel-service-icon"><i class="fas fa-hammer"></i></span>
+            <h5 class="d-inline">Carpentry</h5>
+            <p>Custom furniture, repairs, and woodwork by skilled carpenters.</p>
+            <a href="services.php?category=Carpentry" class="btn btn-light btn-sm mt-2">Learn More</a>
+          </div>
+        </div>
       </div>
     </div>
     <div class="carousel-item">
-      <img src="assets/images/mechanic.jpeg" alt="Mechanic service - Car repair" />
-      <div class="carousel-caption">
-        <span class="carousel-service-icon"><i class="fas fa-car"></i></span>
-        <h5 class="d-inline">Mechanic</h5>
-        <p>Professional mechanics for car repairs and maintenance at your convenience.</p>
-        <a href="services.php?category=mechanic" class="btn btn-light btn-sm mt-2">Learn More</a>
+      <div class="row justify-content-center align-items-end">
+        <div class="col-md-6 text-center">
+          <img src="assets/images/delivery services.jpeg" alt="Delivery service - Package delivery" class="carousel-img" />
+          <div class="carousel-desc mt-3">
+            <span class="carousel-service-icon"><i class="fas fa-truck"></i></span>
+            <h5 class="d-inline">Delivery</h5>
+            <p>Fast and reliable delivery services for your packages and goods.</p>
+            <a href="services.php?category=Delivery" class="btn btn-light btn-sm mt-2">Learn More</a>
+          </div>
+        </div>
+        <div class="col-md-6 text-center">
+          <img src="assets/images/catering1.jpeg" alt="Catering service - Event food" class="carousel-img" />
+          <div class="carousel-desc mt-3">
+            <span class="carousel-service-icon"><i class="fas fa-utensils"></i></span>
+            <h5 class="d-inline">Catering</h5>
+            <p>Delicious catering for your events, parties, and special occasions.</p>
+            <a href="services.php?category=Catering" class="btn btn-light btn-sm mt-2">Learn More</a>
+          </div>
+        </div>
       </div>
     </div>
     <div class="carousel-item">
-      <img src="assets/images/capenters.jpeg" alt="Carpentry service - Woodwork" />
-      <div class="carousel-caption">
-        <span class="carousel-service-icon"><i class="fas fa-hammer"></i></span>
-        <h5 class="d-inline">Carpentry</h5>
-        <p>Custom furniture, repairs, and woodwork by skilled carpenters.</p>
-        <a href="services.php?category=carpentry" class="btn btn-light btn-sm mt-2">Learn More</a>
+      <div class="row justify-content-center align-items-end">
+        <div class="col-md-6 text-center">
+          <img src="assets/images/electrician1.jpeg" alt="Electrician service - Electrical work" class="carousel-img" />
+          <div class="carousel-desc mt-3">
+            <span class="carousel-service-icon"><i class="fas fa-bolt"></i></span>
+            <h5 class="d-inline">Electrician</h5>
+            <p>Expert electrical installations, repairs, and troubleshooting for your home or business.</p>
+            <a href="services.php?category=Electrician" class="btn btn-light btn-sm mt-2">Learn More</a>
+          </div>
+        </div>
+        <div class="col-md-6 text-center">
+          <img src="assets/images/hair-styling.jpeg" alt="Hair Styling service - Salon" class="carousel-img" />
+          <div class="carousel-desc mt-3">
+            <span class="carousel-service-icon"><i class="fas fa-scissors"></i></span>
+            <h5 class="d-inline">Hair Styling</h5>
+            <p>Professional haircuts, styling, and grooming for all ages and occasions.</p>
+            <a href="services.php?category=Hair Styling" class="btn btn-light btn-sm mt-2">Learn More</a>
+          </div>
+        </div>
       </div>
     </div>
     <div class="carousel-item">
-      <img src="assets/images/delivery services.jpeg" alt="Delivery service - Package delivery" />
-      <div class="carousel-caption">
-        <span class="carousel-service-icon"><i class="fas fa-truck"></i></span>
-        <h5 class="d-inline">Delivery</h5>
-        <p>Fast and reliable delivery services for your packages and goods.</p>
-        <a href="services.php?category=delivery" class="btn btn-light btn-sm mt-2">Learn More</a>
+      <div class="row justify-content-center align-items-end">
+        <div class="col-md-6 text-center">
+          <img src="assets/images/painting.jpeg" alt="Painting service - House painting" class="carousel-img" />
+          <div class="carousel-desc mt-3">
+            <span class="carousel-service-icon"><i class="fas fa-paint-roller"></i></span>
+            <h5 class="d-inline">Painting</h5>
+            <p>Quality painting services for homes, offices, and commercial spaces.</p>
+            <a href="services.php?category=Painting" class="btn btn-light btn-sm mt-2">Learn More</a>
+          </div>
+        </div>
+        <div class="col-md-6 text-center">
+          <img src="assets/images/photographer.jpeg" alt="Photographer service - Event photography" class="carousel-img" />
+          <div class="carousel-desc mt-3">
+            <span class="carousel-service-icon"><i class="fas fa-camera"></i></span>
+            <h5 class="d-inline">Photographer</h5>
+            <p>Capture your special moments with professional photography services.</p>
+            <a href="services.php?category=Photographer" class="btn btn-light btn-sm mt-2">Learn More</a>
+          </div>
+        </div>
       </div>
     </div>
     <div class="carousel-item">
-      <img src="assets/images/catering.web" alt="Catering service - Event food" />
-      <div class="carousel-caption">
-        <span class="carousel-service-icon"><i class="fas fa-utensils"></i></span>
-        <h5 class="d-inline">Catering</h5>
-        <p>Delicious catering for your events, parties, and special occasions.</p>
-        <a href="services.php?category=catering" class="btn btn-light btn-sm mt-2">Learn More</a>
+      <div class="row justify-content-center align-items-end">
+        <div class="col-md-6 text-center mx-auto">
+          <img src="assets/images/Pet care.jpeg" alt="Pet Care service - Animal care" class="carousel-img" />
+          <div class="carousel-desc mt-3">
+            <span class="carousel-service-icon"><i class="fas fa-paw"></i></span>
+            <h5 class="d-inline">Pet Care</h5>
+            <p>Quality care and grooming for your beloved pets.</p>
+            <a href="services.php?category=Pet Care" class="btn btn-light btn-sm mt-2">Learn More</a>
+          </div>
+        </div>
+        <div class="col-md-6 text-center">
+          <img src="assets/images/tutoring1.jpeg" alt="Tutoring service - Education" class="carousel-img" />
+          <div class="carousel-desc mt-3">
+            <span class="carousel-service-icon"><i class="fas fa-graduation-cap"></i></span>
+            <h5 class="d-inline">Tutoring</h5>
+            <p>Personalized tutoring for all subjects and levels to help you succeed.</p>
+            <a href="services.php?category=Tutoring" class="btn btn-light btn-sm mt-2">Learn More</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <div class="row justify-content-center align-items-end">
+        <div class="col-md-6 text-center">
+          <img src="assets/images/cleaning services.jpeg" alt="Cleaning service - Home and office cleaning" class="carousel-img" />
+          <div class="carousel-desc mt-3">
+            <span class="carousel-service-icon"><i class="fas fa-broom"></i></span>
+            <h5 class="d-inline">Cleaning</h5>
+            <p>Professional cleaning for homes, offices, and commercial spaces.</p>
+            <a href="services.php?category=Cleaning" class="btn btn-light btn-sm mt-2">Learn More</a>
+          </div>
+        </div>
+        <div class="col-md-6 text-center">
+          <img src="assets/images/security.jpeg" alt="Security service - Guard and surveillance" class="carousel-img" />
+          <div class="carousel-desc mt-3">
+            <span class="carousel-service-icon"><i class="fas fa-shield-alt"></i></span>
+            <h5 class="d-inline">Security</h5>
+            <p>Reliable security services for your property and events.</p>
+            <a href="services.php?category=Security" class="btn btn-light btn-sm mt-2">Learn More</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -164,7 +280,7 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
                         <i class="fas fa-wrench fa-2x text-primary-servigo mb-3"></i>
                         <h3 class="h5">Plumbing</h3>
                         <p>Expert plumbing and water system services</p>
-                        <a href="services.php?category=plumbing" class="service-link">Find Plumbers</a>
+                        <a href="services.php?category=plumbering" class="service-link">Find Plumbers</a>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6">
@@ -404,7 +520,7 @@ $latest_providers = $db->query("SELECT u.first_name, u.last_name, u.city, u.regi
                     </h2>
                     <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="faq1" data-bs-parent="#faqAccordion">
                         <div class="accordion-body">
-                            Simply browse our services, choose a provider, and click “Request Service” to book.
+                            Simply browse our services, choose a provider, and click “Book Service” to schedule.
                         </div>
                     </div>
                 </div>

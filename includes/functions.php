@@ -109,7 +109,10 @@ function get_user_notifications($user_id, $limit = 10) {
         ORDER BY created_at DESC 
         LIMIT ?
     ");
-    $stmt->execute([$user_id, $limit]);
+    // Bind as integers to satisfy MySQL LIMIT requirements
+    $stmt->bindValue(1, (int)$user_id, PDO::PARAM_INT);
+    $stmt->bindValue(2, (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
     return $stmt->fetchAll();
 }
 
@@ -291,7 +294,10 @@ function get_provider_reviews($provider_id, $limit = 10) {
         ORDER BY r.created_at DESC
         LIMIT ?
     ");
-    $stmt->execute([$provider_id, $limit]);
+    // Bind as integers to satisfy MySQL LIMIT requirements
+    $stmt->bindValue(1, (int)$provider_id, PDO::PARAM_INT);
+    $stmt->bindValue(2, (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
     return $stmt->fetchAll();
 }
 

@@ -19,9 +19,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_id'])) {
     if (isset($_POST['accept'])) {
         $stmt = $db->prepare("UPDATE service_requests SET status = 'accepted' WHERE id = ? AND provider_id = ?");
         $stmt->execute([$request_id, $provider_id]);
+        // Notify customer of acceptance
+        $custStmt = $db->prepare("SELECT customer_id, title FROM service_requests WHERE id = ?");
+        $custStmt->execute([$request_id]);
+        if ($row = $custStmt->fetch()) {
+            create_notification((int)$row['customer_id'], 'Booking accepted', 'Your booking ('. $row['title'] .') was accepted.', 'request');
+        }
     } elseif (isset($_POST['decline'])) {
         $stmt = $db->prepare("UPDATE service_requests SET status = 'declined' WHERE id = ? AND provider_id = ?");
         $stmt->execute([$request_id, $provider_id]);
+        // Notify customer of decline
+        $custStmt = $db->prepare("SELECT customer_id, title FROM service_requests WHERE id = ?");
+        $custStmt->execute([$request_id]);
+        if ($row = $custStmt->fetch()) {
+            create_notification((int)$row['customer_id'], 'Booking declined', 'Your booking ('. $row['title'] .') was declined.', 'request');
+        }
     } elseif (isset($_POST['complete'])) {
         $stmt = $db->prepare("UPDATE service_requests SET status = 'completed' WHERE id = ? AND provider_id = ?");
         $stmt->execute([$request_id, $provider_id]);

@@ -86,24 +86,25 @@ if (isset($_GET['user_id'])) {
     }
 }
 
-// Get all users for new message (exclude self)
+// Get all users for new message (exclude self). Include email and provider business_name for richer search labels
 if ($user_type === 'provider') {
     // Providers can only message customers
     $stmt = $db->prepare("
-        SELECT id, first_name, last_name, user_type, city 
-        FROM users 
-        WHERE id != ? AND is_active = 1 AND user_type = 'customer' 
-        ORDER BY first_name, last_name
+        SELECT u.id, u.first_name, u.last_name, u.user_type, u.city, u.email, NULL as business_name
+        FROM users u
+        WHERE u.id != ? AND u.is_active = 1 AND u.user_type = 'customer'
+        ORDER BY u.first_name, u.last_name
     ");
     $stmt->execute([$user_id]);
     $all_users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
     // Customers and others can message anyone
     $stmt = $db->prepare("
-        SELECT id, first_name, last_name, user_type, city 
-        FROM users 
-        WHERE id != ? AND is_active = 1 
-        ORDER BY first_name, last_name
+        SELECT u.id, u.first_name, u.last_name, u.user_type, u.city, u.email, sp.business_name
+        FROM users u
+        LEFT JOIN service_providers sp ON sp.user_id = u.id
+        WHERE u.id != ? AND u.is_active = 1
+        ORDER BY u.first_name, u.last_name
     ");
     $stmt->execute([$user_id]);
     $all_users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -247,11 +248,22 @@ $primary = '#007bff';
             </div>
             <div class="modal-body">
               <div class="form-group">
+                <label for="receiver_search">Search User</label>
+                <input type="text" id="receiver_search" class="form-control" placeholder="Search by name, email, business, city...">
+              </div>
+              <div class="form-group mt-2">
                 <label for="receiver_id">Select User</label>
                 <select name="receiver_id" id="receiver_id" class="form-control" required>
                   <option value="">-- Select User --</option>
                   <?php foreach ($all_users as $u): ?>
-                    <option value="<?php echo $u['id']; ?>"><?php echo htmlspecialchars($u['first_name'] . ' ' . $u['last_name'] . ' (' . ucfirst($u['user_type']) . ', ' . $u['city'] . ')'); ?></option>
+                    <?php
+                      $label = trim(($u['first_name'] ?? '') . ' ' . ($u['last_name'] ?? ''));
+                      $typeCity = '(' . ucfirst($u['user_type']) . ', ' . ($u['city'] ?? '') . ')';
+                      $email = $u['email'] ?? '';
+                      $biz = $u['business_name'] ?? '';
+                      $fullLabel = $label . (strlen($email)? ' - ' . $email : '') . (strlen($biz)? ' - ' . $biz : '') . ' ' . $typeCity;
+                    ?>
+                    <option value="<?php echo $u['id']; ?>" data-search="<?php echo htmlspecialchars(strtolower($fullLabel)); ?>"><?php echo htmlspecialchars($fullLabel); ?></option>
                   <?php endforeach; ?>
                 </select>
               </div>
@@ -291,6 +303,18 @@ $(function () {
             var name = $(this).find('h6').text().toLowerCase();
             var preview = $(this).find('.last-message-preview').text().toLowerCase();
             $(this).toggle(name.indexOf(val) !== -1 || preview.indexOf(val) !== -1);
+        });
+    });
+});
+
+// New message recipient filter
+$(function () {
+    $('#receiver_search').on('input', function() {
+        var val = $(this).val().toLowerCase();
+        $('#receiver_id option').each(function() {
+            if (!this.value) { return; }
+            var text = $(this).attr('data-search');
+            $(this).toggle(text.indexOf(val) !== -1);
         });
     });
 });

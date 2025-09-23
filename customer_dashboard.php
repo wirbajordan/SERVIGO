@@ -113,7 +113,7 @@ $total_spent = $stmt->fetchColumn() ?: 0;
                             <div class="card-body d-flex align-items-center">
                                 <i class="fas fa-calendar-check text-primary-servigo me-3"></i>
                                 <div>
-                                    <div class="fw-semibold">Request a Service</div>
+                                    <div class="fw-semibold">Book a Service</div>
                                     <div class="text-muted small">Book a provider</div>
                                 </div>
                             </div>

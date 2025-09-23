@@ -8,95 +8,202 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$user = get_logged_in_user();
-
-// Get unread admin notifications count
-$unread_admin_notifications = 0;
-if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin') {
-    $db = getDB();
-    $unread_admin_notifications = $db->query("SELECT COUNT(*) FROM notifications WHERE for_admin = 1 AND is_read = 0")->fetchColumn();
+// Redirect providers to provider dashboard
+if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'provider') {
+    header('Location: provider_dashboard.php');
+    exit();
 }
+
+$db = getDB();
+$user_id = $_SESSION['user_id'];
+
+// Fetch customer profile
+$stmtUser = $db->prepare('SELECT first_name, last_name, city, address FROM users WHERE id = ?');
+$stmtUser->execute([$user_id]);
+$customer = $stmtUser->fetch() ?: ['first_name' => '', 'last_name' => '', 'city' => '', 'address' => ''];
+$customer_city = $customer['city'] ?? '';
+$customer_quarter = '';
+if (!empty($customer['address'])) {
+    $parts = explode(',', $customer['address']);
+    $customer_quarter = trim($parts[0]);
+}
+
+// Stats
+$pending_requests = get_user_requests($user_id, 'pending');
+$in_progress_requests = get_user_requests($user_id, 'in_progress');
+$completed_requests = get_user_requests($user_id, 'completed');
+$unread_notifications = get_unread_notifications_count($user_id);
+
+// Recent bookings (last 5)
+$stmt = $db->prepare("\n    SELECT sr.*, sc.name AS category_name, u.first_name, u.last_name\n    FROM service_requests sr\n    JOIN service_categories sc ON sr.category_id = sc.id\n    JOIN users u ON sr.provider_id = u.id\n    WHERE sr.customer_id = ?\n    ORDER BY sr.created_at DESC\n    LIMIT 5\n");
+$stmt->execute([$user_id]);
+$recent_requests = $stmt->fetchAll();
+
+// Suggested nearby providers (top 6)
+$sqlProviders = "\n    SELECT sp.id, sp.business_name, sp.rating, u.first_name, u.last_name, u.city, u.address\n    FROM service_providers sp\n    JOIN users u ON sp.user_id = u.id\n    WHERE u.is_active = 1 AND sp.is_available = 1\n";
+$params = [];
+if ($customer_city !== '') {
+    $sqlProviders .= " AND u.city = ?";
+    $params[] = $customer_city;
+}
+$sqlProviders .= " ORDER BY sp.rating DESC, sp.business_name LIMIT 6";
+$stmt = $db->prepare($sqlProviders);
+$stmt->execute($params);
+$suggested_providers = $stmt->fetchAll();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - ServiGo</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <title>Customer Dashboard | ServiGo</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-    <?php include 'includes/site_header.php'; ?>
+<div class="container py-5">
+    <h2 class="mb-4 text-center">Welcome, <?php echo htmlspecialchars(($customer['first_name'] ?? '') . ' ' . ($customer['last_name'] ?? '')); ?></h2>
 
-    <section class="py-4">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 mb-4">
-                    <div class="card h-100">
-                        <div class="card-header fw-semibold">My Menu</div>
-                        <div class="list-group list-group-flush">
-                            <a href="dashboard.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-home me-2"></i>Dashboard</a>
-                            <a href="edit_profile.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-user-edit me-2"></i>Edit Profile</a>
-                            <a href="request_service.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-calendar-check me-2"></i>Request Service</a>
-                            <a href="messages.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-comments me-2"></i>Messages</a>
-                            <a href="notifications.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-bell me-2"></i>Notifications</a>
-                            <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'provider'): ?>
-                            <div class="border-top"></div>
-                            <a href="provider_dashboard.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-briefcase me-2"></i>Provider Dashboard</a>
-                            <a href="provider_services.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-tools me-2"></i>My Services</a>
-                            <?php endif; ?>
-                            <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin'): ?>
-                            <div class="border-top"></div>
-                            <a href="admin/dashboard.php" class="list-group-item list-group-item-action d-flex align-items-center"><i class="fas fa-gauge-high me-2"></i>Admin Dashboard</a>
-                            <a href="admin/notifications.php" class="list-group-item list-group-item-action d-flex align-items-center">
-                                <i class="fas fa-bell me-2"></i>Admin Notifications
-                                <?php if ($unread_admin_notifications > 0): ?>
-                                    <span class="badge bg-danger ms-auto"><?php echo $unread_admin_notifications; ?></span>
-                                <?php endif; ?>
-                            </a>
-                            <?php endif; ?>
-                            <div class="border-top"></div>
-                            <a href="logout.php" class="list-group-item list-group-item-action d-flex align-items-center text-danger"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-9">
-                    <div class="card card-servigo shadow mb-4">
-                        <div class="card-body p-5 text-center">
-                            <h2 class="text-primary-servigo fw-bold mb-3">Welcome, <?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>!</h2>
-                            <p class="mb-2">Your user type: <span class="badge bg-success-servigo text-uppercase ms-1"><?php echo ucfirst($user['user_type']); ?></span></p>
-                            <p class="mb-2">Email: <span class="fw-semibold text-neutral-servigo"><?php echo htmlspecialchars($user['email']); ?></span></p>
-                            <p class="mb-2">Phone: <span class="fw-semibold text-neutral-servigo"><?php echo htmlspecialchars($user['phone']); ?></span></p>
-                            <p class="mb-2">City: <span class="fw-semibold text-neutral-servigo"><?php echo htmlspecialchars($user['city']); ?></span></p>
-                            <p class="mb-4">Region: <span class="fw-semibold text-neutral-servigo"><?php echo htmlspecialchars($user['region']); ?></span></p>
-                            <a href="logout.php" class="btn btn-secondary">Logout</a>
-                        </div>
-                    </div>
-                    <div class="text-center my-4">
-                        <a href="pay.php" class="btn btn-success btn-lg">Make a Payment</a>
-                    </div>
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6>Pending Bookings</h6>
+                    <h2><?php echo count($pending_requests); ?></h2>
+                    <a href="customer_requests.php" class="small">View all</a>
                 </div>
             </div>
         </div>
-    </section>
-
-    <footer class="footer bg-neutral-dark text-white mt-5">
-        <div class="container py-4">
-            <div class="row">
-                <div class="col-md-6">
-                    <h3 class="fw-bold"><i class="fas fa-tools me-2"></i>ServiGo</h3>
-                    <p>Connecting Cameroon with trusted local service providers.</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="mb-0">&copy; 2024 ServiGo. All rights reserved. | Made for Cameroon</p>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6>In Progress</h6>
+                    <h2><?php echo count($in_progress_requests); ?></h2>
+                    <a href="customer_requests.php?status=in_progress" class="small">Track</a>
                 </div>
             </div>
         </div>
-    </footer>
-    <script src="assets/js/script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6>Completed</h6>
+                    <h2><?php echo count($completed_requests); ?></h2>
+                    <a href="customer_requests.php?status=completed" class="small">History</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6>Notifications</h6>
+                    <h2><?php echo (int)$unread_notifications; ?></h2>
+                    <a href="notifications.php" class="small">Open inbox</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <a href="request_service.php" class="text-decoration-none">
+                <div class="card h-100 p-4 text-center">
+                    <i class="fas fa-calendar-check fa-2x mb-3 text-primary"></i>
+                    <div class="fw-semibold">Book a Service</div>
+                    <div class="text-muted small">Request and schedule a provider</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="messages.php" class="text-decoration-none">
+                <div class="card h-100 p-4 text-center">
+                    <i class="fas fa-comments fa-2x mb-3 text-primary"></i>
+                    <div class="fw-semibold">Messages</div>
+                    <div class="text-muted small">Chat with providers</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="edit_profile.php" class="text-decoration-none">
+                <div class="card h-100 p-4 text-center">
+                    <i class="fas fa-user fa-2x mb-3 text-primary"></i>
+                    <div class="fw-semibold">Edit Profile</div>
+                    <div class="text-muted small">Update your details</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Recent Bookings</span>
+            <a href="customer_requests.php" class="btn btn-sm btn-outline-secondary">See all</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Service</th>
+                        <th>Provider</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($recent_requests)): ?>
+                        <tr><td colspan="5" class="text-center text-muted">No bookings yet.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($recent_requests as $r): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($r['title']); ?></td>
+                                <td><?php echo htmlspecialchars($r['category_name']); ?></td>
+                                <td><?php echo htmlspecialchars($r['first_name'] . ' ' . $r['last_name']); ?></td>
+                                <td><span class="badge badge-<?php
+                                    switch($r['status']){
+                                        case 'pending': echo 'warning'; break;
+                                        case 'accepted': echo 'primary'; break;
+                                        case 'in_progress': echo 'info'; break;
+                                        case 'completed': echo 'success'; break;
+                                        case 'cancelled': echo 'secondary'; break;
+                                        case 'declined': echo 'danger'; break;
+                                        default: echo 'light';
+                                    }
+                                ?>"><?php echo ucfirst($r['status']); ?></span></td>
+                                <td><?php echo format_datetime($r['created_at']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Suggested Providers Near You<?php echo $customer_city ? ' — ' . htmlspecialchars($customer_city) : ''; ?></span>
+            <a href="providers.php" class="btn btn-sm btn-outline-secondary">Browse all</a>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <?php if (empty($suggested_providers)): ?>
+                    <div class="col-12 text-center text-muted">No providers to suggest yet.</div>
+                <?php else: ?>
+                    <?php foreach ($suggested_providers as $sp): ?>
+                        <div class="col-md-4 mb-3">
+                            <div class="border rounded p-3 h-100">
+                                <div class="fw-semibold mb-1"><?php echo htmlspecialchars(($sp['first_name'] ?? '') . ' ' . ($sp['last_name'] ?? '')); ?></div>
+                                <div class="text-muted small mb-1"><?php echo htmlspecialchars($sp['business_name'] ?? ''); ?></div>
+                                <div class="small mb-1"><?php echo htmlspecialchars($sp['address'] ?: $sp['city']); ?></div>
+                                <div class="small mb-2">Rating: <?php echo number_format((float)$sp['rating'], 1); ?></div>
+                                <a class="btn btn-sm btn-outline-primary" href="request_service.php">Book</a>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 

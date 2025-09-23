@@ -4,16 +4,51 @@ require_once 'includes/functions.php';
 
 $db = getDB();
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$category = isset($_GET['category']) ? trim($_GET['category']) : '';
+$categoryDisplay = '';
 
-// Fetch service categories (with optional search)
-if ($search) {
-    $stmt = $db->prepare("SELECT * FROM service_categories WHERE is_active = 1 AND name LIKE ? ORDER BY name");
-    $stmt->execute(['%' . $search . '%']);
+// Fetch service categories (supports optional search and/or category filter)
+if ($category !== '') {
+    if (ctype_digit($category)) {
+        // Filter by category ID
+        if ($search !== '') {
+            $stmt = $db->prepare("SELECT * FROM service_categories WHERE is_active = 1 AND id = ? AND (name LIKE ? OR description LIKE ?) ORDER BY name");
+            $like = '%' . $search . '%';
+            $stmt->execute([$category, $like, $like]);
+        } else {
+            $stmt = $db->prepare("SELECT * FROM service_categories WHERE is_active = 1 AND id = ? ORDER BY name");
+            $stmt->execute([$category]);
+        }
+    } else {
+        // Filter by category name (case-insensitive)
+        if ($search !== '') {
+            $stmt = $db->prepare("SELECT * FROM service_categories WHERE is_active = 1 AND LOWER(name) = LOWER(?) AND (name LIKE ? OR description LIKE ?) ORDER BY name");
+            $like = '%' . $search . '%';
+            $stmt->execute([$category, $like, $like]);
+        } else {
+            $stmt = $db->prepare("SELECT * FROM service_categories WHERE is_active = 1 AND LOWER(name) = LOWER(?) ORDER BY name");
+            $stmt->execute([$category]);
+        }
+    }
+} else if ($search !== '') {
+    // Generic search across names/descriptions
+    $stmt = $db->prepare("SELECT * FROM service_categories WHERE is_active = 1 AND (name LIKE ? OR description LIKE ?) ORDER BY name");
+    $like = '%' . $search . '%';
+    $stmt->execute([$like, $like]);
 } else {
     $stmt = $db->prepare("SELECT * FROM service_categories WHERE is_active = 1 ORDER BY name");
     $stmt->execute();
 }
 $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Determine nice display label for selected category
+if ($category !== '') {
+    if (count($categories) > 0) {
+        $categoryDisplay = $categories[0]['name'];
+    } else {
+        $categoryDisplay = $category;
+    }
+}
 
 $primary = '#007bff';
 ?>
@@ -35,10 +70,19 @@ $primary = '#007bff';
 </head>
 <body>
 <div class="container py-5">
-    <h2 class="mb-4 text-center" style="color: <?php echo $primary; ?>;">Available Services</h2>
+    <h2 class="mb-4 text-center" style="color: <?php echo $primary; ?>;">Available Services<?php echo $category !== '' ? ' - ' . htmlspecialchars($categoryDisplay) : ''; ?></h2>
+    <?php if ($category !== ''): ?>
+        <div class="alert alert-secondary text-center py-2" role="alert">
+            Showing services for <strong><?php echo htmlspecialchars($categoryDisplay); ?></strong>.
+            <a href="services.php" class="ml-2">Clear filter</a>
+        </div>
+    <?php endif; ?>
     <form method="get" class="search-bar mb-4">
         <div class="input-group">
             <input type="text" name="search" class="form-control" placeholder="Search services..." value="<?php echo htmlspecialchars($search); ?>">
+            <?php if ($category !== ''): ?>
+                <input type="hidden" name="category" value="<?php echo htmlspecialchars($category); ?>">
+            <?php endif; ?>
             <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
         </div>
     </form>
@@ -51,6 +95,9 @@ $primary = '#007bff';
                         <div class="service-icon mb-3"><i class="<?php echo htmlspecialchars($cat['icon']); ?>"></i></div>
                         <h5><?php echo htmlspecialchars($cat['name']); ?></h5>
                         <p class="text-muted"><?php echo htmlspecialchars($cat['description']); ?></p>
+                    </div>
+                    <div class="mt-3">
+                        <a href="providers.php?category=<?php echo (int)$cat['id']; ?>" class="btn btn-outline-primary btn-sm">View Providers</a>
                     </div>
                 </div>
             </div>
